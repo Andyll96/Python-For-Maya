@@ -25,11 +25,26 @@ for obj in selection:
     
     # we do this in order to get the children of the transform which is the object
     children = cmds.listRelatives(obj, children=True, fullPath=True) or []
-    print(children)
+    # print(children)
     
     if len(children) == 1:
         child = children[0]
         objType = cmds.objectType(child) 
     else:
         objType = cmds.objectType(obj)
-    print(objType)
+    # print(objType)
+    
+    if objType == "mesh":
+        suffix = "geo"
+    elif objType == "joint":
+        suffix = "jnt"
+    elif objType == "camera":
+        print("Skipping camera")
+        continue
+    else:
+        suffix = "grp"
+        
+    newName = shortName + "_" + suffix
+    # print(newName)
+    
+    cmds.rename(obj, newName)
