@@ -10,6 +10,7 @@ SUFFIXES = {
 DEFAULT_SUFFIX = "grp"
 
 def rename(selection=False):
+
     """This function will rename any objects to have the correct suffix
 
     Args:
@@ -28,7 +29,7 @@ def rename(selection=False):
     # this will list the current objects
     # print(cmds.ls(objects=True))
 
-    objects = cmds.ls(objects=selection, dag=True, long=True)
+    objects = cmds.ls(selection=selection, dag=True, long=True)
 
     # error check, if you set selection to True but don't actually select something
     if selection and not objects:
@@ -91,3 +92,5 @@ def rename(selection=False):
         objects[index] = obj.replace(shortName, newName)
 
     return objects
+
+rename()
