@@ -10,6 +10,9 @@ def createGear(teeth=10, length=0.3):
     # this grabs the faces on the side of the cylinder that we want
     sideFaces = range(spans*2, spans*3, 2)
 
+    # clears any selection already made
+    cmds.select(clear=True)
+
     for face in sideFaces:
         # the add parameter will add the new face selection to the total selection, so that way we aren't selecting just one face
         cmds.select(f"{transform}.f[{face}]", add=True)
