@@ -53,7 +53,7 @@ class ControllerLibrary(dict):
         print(mayaFiles)
 
         for ma in mayaFiles:
-            name, ext = os.path.splittext(ma)
+            name, ext = os.path.splitext(ma)
             path = os.path.join(directory, ma)
 
             infoFile = f"{name}.json"
