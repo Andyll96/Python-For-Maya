@@ -20,7 +20,7 @@ def createDirectory(directory=DIRECTORY):
 class ControllerLibrary(dict):
     
     # *info will pass in a tuple, **info will pass in a dictionary
-    def save(self, name, directory=DIRECTORY, **info):
+    def save(self, name, directory=DIRECTORY, screenshot=True, **info):
         createDirectory()
         path = os.path.join(directory, f"{name}.ma")
         
@@ -34,6 +34,10 @@ class ControllerLibrary(dict):
             cmds.file(force=True, type="mayaAscii", exportSelected=True)
         else:
             cmds.file(save=True, type="mayaAscii", force=True)
+
+        if screenshot:
+            info['screenshot'] = self.saveScreenshot(name, directory=directory)  
+
         
         with open(infoFile, 'w') as f:
             json.dump(info, f, indent=4)
@@ -62,6 +66,11 @@ class ControllerLibrary(dict):
             else:
                 # print("no info found")
                 info = {}
+
+            screenshot = f"{name}.jpg"        
+            if screenshot in files:
+                info['screenshot'] = os.path.join(directory, name)
+
             info['name'] = name
             info['path'] = path
 
@@ -74,3 +83,13 @@ class ControllerLibrary(dict):
         path = self[name]['path']
         # i is for import
         cmds.file(path,i=True, usingNamespaces=False)
+
+    def saveScreenshot(self, name, directory=DIRECTORY):
+        path = os.path.join(directory, f"{name}.jpg")
+        cmds.viewFit()
+        # you can figure this out through the MEL commands when you go to the Maya render settings and set the File Output, Image Format to JPEG
+        cmds.setAttr('defaultRenderGlobals.imageFormat', 8)
+
+        # showOrnaments is maya overlays 
+        cmds.playblast(completeFileName=path, forceOverwrite=True, format='image', width=200, height=200, showOrnaments=False, startTime=1, endTime=1, viewer=False)
+        return path
