@@ -94,5 +94,5 @@ class ControllerLibrary(dict):
         cmds.setAttr('defaultRenderGlobals.imageFormat', 8)
 
         # showOrnaments is maya overlays 
-        cmds.playblast(completeFileName=path, forceOverwrite=True, format='image', width=200, height=200, showOrnaments=False, startTime=1, endTime=1, viewer=False)
+        cmds.playblast(completeFilename=path, forceOverwrite=True, format='image', width=200, height=200, showOrnaments=False, startTime=1, endTime=1, viewer=False)
         return path
