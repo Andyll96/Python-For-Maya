@@ -18,6 +18,8 @@ Maya's Programming Languages and Libraries
         - Very clean and Pythonic
         - Very succint
         - Can be slower in some cases
+            - Creating and passing around PyNode objects is much heavier than strings in cmds
+        - Not directly supported by Autodesk but Maya ships with it as a thrid party plugin
         - Can be less stable in cases
         - Direct handles to objects
         - Much more pleasant to use
