@@ -24,7 +24,13 @@ class ControllerLibraryUI(QtWidgets.QDialog):
         saveBtn = QtWidgets.QPushButton("Save")
         saveLayout.addWidget(saveBtn)
 
+        size = 150
+        buffer = 12
         self.listWidget = QtWidgets.QListWidget()
+        self.listWidget.setViewMode(QtWidgets.QListWidget.IconMode)
+        self.listWidget.setIconSize(QtCore.QSize(size, size))
+        self.listWidget.setResizeMode(QtWidgets.QListWidget.Adjust)
+        self.listWidget.setGridSize(QtCore.QSize(size+buffer, size+buffer))
         layout.addWidget(self.listWidget)
 
         btnWidget = QtWidgets.QWidget()
@@ -41,7 +47,18 @@ class ControllerLibraryUI(QtWidgets.QDialog):
         btnLayout.addWidget(closeBtn)
 
     def populate(self):
-        pass
+        self.library.find()
+
+        # self.library is a dictionary
+        for name, info in self.library.items():
+            # print(name, info)
+            item = QtWidgets.QListWidgetItem(name)
+            self.listWidget.addItem(item)
+
+            screenshot = info.get("screenshot")
+            if screenshot:
+                icon = QtGui.QIcon(screenshot)
+                item.setIcon(icon)
 
 def showUI():
     ui = ControllerLibraryUI()
