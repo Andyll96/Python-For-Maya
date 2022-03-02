@@ -42,3 +42,6 @@ Ducktyping
  - this allows us to make functions that don't care what the type of the parameters are. As long as they have the same interface  
  
 https://github.com/mottosso/Qt.py
+
+PyQt5 Documentation - pyqt.sourceforge.net/Docs/PyQt5
+nullege.com - search PyQt5
