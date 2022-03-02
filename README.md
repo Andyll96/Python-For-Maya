@@ -1,5 +1,35 @@
 "# Python For Maya" 
 
+Maya's Programming Languages and Libraries
+    -Three API libraries
+    -cmds
+        - consists of commands to string together to make larger applications
+        - Originally designed for MEL. Not very Pythonic. Can be overy verbose. Objects are handled by name. Good performance. Higher Level Access
+    - OpenMaya
+        - allows deep access to Mayas internal architecture
+        - more difficult
+        - Two Versions. Originally designed for C++. Not very Pythonic. Can be very verbose. More complex to use. High Performance. Low Level Access. Direct handles to Objects
+        - Version 2 is built for Python
+        - Version 2 isn't complete yet (dated 2017)
+    - PyMEL
+        - Designed by Luma Pictures
+        - Designed for Python
+        - Wraps both cmds and Open Maya
+        - Very clean and Pythonic
+        - Very succint
+        - Can be slower in some cases
+        - Can be less stable in cases
+        - Direct handles to objects
+        - Much more pleasant to use
+    - 4 programming languages
+        - MEL (Scripting)
+            Maya specific. Interactive. Commands are shown by Maya. Can only be used for scripts
+        - C++ (Compiled)
+        - C# (Compiled)
+            both can be used outside Maya. Needs to be compiled. Can't be used interactively. Can only be used for plugins. Much beter performance
+        - Python
+            Can use both APIs. Can write plugins and scripts. Can be used outside Maya. Huge Community. Slower than C++/C#. Easy to learn
+
 For creating UI's for Maya you have 2 options
     - using the Maya cmd library 
     - using Qt
