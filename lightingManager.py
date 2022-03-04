@@ -1,3 +1,4 @@
+from logging.config import valid_ident
 from PySide2 import QtWidgets, QtGui, QtCore
 import pymel.core as pm
 from functools import partial
@@ -43,13 +44,28 @@ class LightManager(QtWidgets.QDialog):
         lightType = self.lightTypeCB.currentText()
         func = self.lightTypes[lightType]
         light = func()
-        widget = LightWdiget(light)
-        self.scrollLayout.addWidget(widget)
+        self.addLight(light)
 
-class LightWdiget(QtWidgets.QWidget):
+    def addLight(self, light):
+        widget = LightWidget(light)
+        self.scrollLayout.addWidget(widget)
+        widget.onSolo.connect(self.onSolo)
+
+    def onSolo(self, value):
+        LightWidget = self.findChildren(LightWidget)
+        # print(LightWidget)
+        for widget in LightWidget:
+            if widget != self.sender():
+                widget.disableLight(value)
+
+
+class LightWidget(QtWidgets.QWidget):
+
+    # if using PyQt, it'll be called pyqtSignal()
+    onSolo = QtCore.Signal(bool)
 
     def __init__(self, light):
-        super(LightWdiget, self).__init__()
+        super(LightWidget, self).__init__()
         light = pm.PyNode(light)
 
         self.light = light
@@ -64,6 +80,34 @@ class LightWdiget(QtWidgets.QWidget):
         #   self.light.visibility.set(val)
         self.name.toggled.connect(lambda val: self.light.getTransform().visibility.set(val))
         layout.addWidget(self.name, 0, 0)
+
+        soloBtn = QtWidgets.QPushButton('Solo')
+        soloBtn.setCheckable(True)
+        # Qt allows you to define your own signals
+        soloBtn.toggled.connect(lambda val: self.onSolo.emit(val))
+        layout.addWidget(soloBtn, 0, 1)
+
+        deleteBtn = QtWidgets.QPushButton("X")
+        deleteBtn.clicked().connect(self.deleteLight)
+        deleteBtn.setMaximumWidth(10)
+        layout.addWidget(deleteBtn, 0, 2)
+
+        intensity = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        intensity.setMinimum(1)
+        intensity.setMaximum(1000)
+        intensity.setValue(self.light.intensity.get())
+        intensity.valueChanged.connect(lambda val: self.light.intensity.set(val))
+        layout.addWidget(intensity, 1, 0, 1, 2)
+        
+    def disableLight(self, value):
+        self.name.setChecked(not value)
+
+    def deleteLight(self):
+        self.setParent(None)
+        self.setVisible(False)
+        self.deleteLater()
+
+        pm.delete(self.light.getTransform(j))
 
 def showUI():
     ui = LightManager()
