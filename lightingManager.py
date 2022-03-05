@@ -20,14 +20,26 @@ class LightManager(QtWidgets.QDialog):
         self.populate()
 
     def populate(self):
-        while self.scrollLayout.count():
+        lightWidgets = self.findChildren(LightWidget)
+        print(lightWidgets)
+        for widgets in lightWidgets:
             widget = self.scrollLayout.takeAt(0).widget()
             if widget:
                 widget.setVisible(False)
                 widget.deleteLater()
 
-            for light in pm.ls(type=["areaLight", "spotLight", "pointLight", "directionalLight","volumeLight"]):
-                self.addLight(light)
+        for light in pm.ls(type=["areaLight", "spotLight", "pointLight", "directionalLight","volumeLight"]):
+            self.addLight(light)
+
+
+        # while self.scrollLayout.count():
+        #     widget = self.scrollLayout.takeAt(0).widget()
+        #     if widget:
+        #         widget.setVisible(False)
+        #         widget.deleteLater()
+
+        #     for light in pm.ls(type=["areaLight", "spotLight", "pointLight", "directionalLight","volumeLight"]):
+        #         self.addLight(light)
 
     def buildUI(self):
         layout = QtWidgets.QGridLayout(self)
