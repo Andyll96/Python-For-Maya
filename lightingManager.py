@@ -109,8 +109,8 @@ class LightManager(QtWidgets.QDialog):
             properties[str(transform)] = {
                 'translate': list(transform.translate.get()),
                 'rotation': list(transform.rotate.get()),
-                'intensity': list(light.intensity.get()),
-                'color': list(light.color.get()),
+                'intensity': light.intensity.get(),
+                'color': light.color.get(),
             }
 
         directory = os.path.join(pm.internalVar(userAppDir=True), 'lightManager')
