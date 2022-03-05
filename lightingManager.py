@@ -2,6 +2,31 @@ from logging.config import valid_ident
 from PySide2 import QtWidgets, QtGui, QtCore
 import pymel.core as pm
 from functools import partial
+import json
+import os
+import time
+# from maya import OpenMayaUI as omui
+
+# from PyQt5 import Qt
+# import logging
+
+# logging.basicConfig()
+# logger = logging.getLogger('LightingManager')
+# logger.setLevel(logging.DEBUG)
+
+# if Qt.__binding__ == 'Pyside':
+#     logger.debug('Using PySide with Shiboken')
+#     from shiboken import wrapInstance
+#     from Qt.QtCore import Signal
+# elif Qt.__binding__.startswith('PyQt'):
+#     logger.debug('Using PyQt with sip')
+#     from sip import wrapinstance as wrapInstance
+#     from Qt.QtCore import pyqtSignal as Signal
+# else:
+#     logger.debug('Using PySide2 with Shiboken')
+#     from shiboken2 import wrapInstance
+#     from Qt.QtCore import Signal
+
 
 class LightManager(QtWidgets.QDialog):
 
@@ -48,11 +73,11 @@ class LightManager(QtWidgets.QDialog):
         for lightType in sorted(self.lightTypes):
             self.lightTypeCB.addItem(lightType)
 
-        layout.addWidget(self.lightTypeCB, 0, 0)
+        layout.addWidget(self.lightTypeCB, 0, 0, 1, 2)
 
         createBtn = QtWidgets.QPushButton('Create')
         createBtn.clicked.connect(self.createLight)
-        layout.addWidget(createBtn, 0, 1)
+        layout.addWidget(createBtn, 0, 2)
 
         scrollWidget = QtWidgets.QWidget()
         scrollWidget.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
@@ -61,11 +86,44 @@ class LightManager(QtWidgets.QDialog):
         scrollArea = QtWidgets.QScrollArea()
         scrollArea.setWidgetResizable(True)
         scrollArea.setWidget(scrollWidget)
-        layout.addWidget(scrollArea, 1, 0, 1, 2)
+        layout.addWidget(scrollArea, 1, 0, 1, 3)
+
+        saveBtn = QtWidgets.QPushButton('Save')
+        saveBtn.clicked.connect(self.saveLights)
+        layout.addWidget(saveBtn, 2, 0)
+
+        importBtn = QtWidgets.QPushButton('Import')
+        importBtn.clicked.connect(self.importLights)
+        layout.addWidget(importBtn, 2, 1)
 
         refreshBtn = QtWidgets.QPushButton('Refresh')
         refreshBtn.clicked.connect(self.populate)
-        layout.addWidget(refreshBtn, 2, 1)
+        layout.addWidget(refreshBtn, 2, 2)
+
+    def saveLights(self):
+        properties = {}
+        for lightWidget in self.findChildren(LightWidget):
+            light = lightWidget.light
+            transform = light.getTransform()
+
+            properties[str(transform)] = {
+                'translate': list(transform.translate.get()),
+                'rotation': list(transform.rotate.get()),
+                'intensity': list(light.intensity.get()),
+                'color': list(light.color.get()),
+            }
+
+        directory = os.path.join(pm.internalVar(userAppDir=True), 'lightManager')
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+
+        lightFile = os.path.join(directory, f"lightFile_{time.strftime('%m%d')}.json")
+        with open(lightFile, 'w') as f:
+            json.dump(properties, f, indent=4)
+
+
+    def importLights(self):
+        pass
 
     def createLight(self):
         lightType = self.lightTypeCB.currentText()
