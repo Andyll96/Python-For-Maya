@@ -1,4 +1,5 @@
 from logging.config import valid_ident
+from msilib.schema import Directory
 from PySide2 import QtWidgets, QtGui, QtCore
 import pymel.core as pm
 from functools import partial
@@ -113,23 +114,52 @@ class LightManager(QtWidgets.QDialog):
                 'color': light.color.get(),
             }
 
-        directory = os.path.join(pm.internalVar(userAppDir=True), 'lightManager')
-        if not os.path.exists(directory):
-            os.mkdir(directory)
+        directory = self.getDirectory()
 
         lightFile = os.path.join(directory, f"lightFile_{time.strftime('%m%d')}.json")
         with open(lightFile, 'w') as f:
             json.dump(properties, f, indent=4)
 
 
-    def importLights(self):
-        pass
+    def getDirectory(self):
+        directory = os.path.join(pm.internalVar(userAppDir=True), 'lightManager')
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        return directory
 
-    def createLight(self):
+
+    def importLights(self):
+        directory = self.getDirectory()
+        fileName = QtWidgets.QFileDialog.getOpenFileName(self, 'Light Browser', directory)
+        with open(fileName[0], 'r') as f:
+            properties = json.load(f)
+        
+        for light, info in properties.items():
+            lightType = info.get('lightType')
+            for lt in self.lightTypes:
+                if f"{lt.split()[0].lower()}Light" == lightType:
+                    break
+            else:
+                print(f'Cannot find a corresponding light type for {light} ({lightType})')
+                continue
+            light = self.createLight(lightType=lt)
+            light.intensity.set(info.get('intensity'))
+            light.color.set(info.get('color'))
+            transform = light.getTransform()
+            transform.translate.set(info.get('translate'))
+            transform.rotate.set(info.get('rotation'))
+        self.populate()
+
+    def createLight(self, lightType=None, add=True):
+        if not lightType:
+            lightType = self.lightTypeCB.currentText()
         lightType = self.lightTypeCB.currentText()
         func = self.lightTypes[lightType]
         light = func()
-        self.addLight(light)
+        if add:
+            self.addLight(light)
+
+        return light
 
     def addLight(self, light):
         widget = LightWidget(light)
@@ -152,6 +182,8 @@ class LightWidget(QtWidgets.QWidget):
     def __init__(self, light):
         super(LightWidget, self).__init__()
         light = pm.PyNode(light)
+        if isinstance(light, pm.nodetypes.Transform):
+            light = light.getShape()
 
         self.light = light
         self.buildUI()
